@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xtits.job.mapper.base.TaskDetailMapper">
+    <select id="listTaskDetailAll" resultType="cn.xtits.job.dto.TaskDetailDto">
+        SELECT
+        <include refid="Base_Column_List"/>,taskBillCode,taskType
+        FROM (
+        SELECT a.*,b.billCode taskBillCode,b.type taskType
+        FROM `ip_taskdetail` a
+        INNER JOIN `ip_taskmain` b
+        ON a.TaskId = b.Id
+        <where>
+            a.DeleteFlag = 0
+            <if test="auditFlag != null">
+                and a.AuditFlag = #{auditFlag}
+            </if>
+            <if test="taskStatusList != null">
+                and a.TaskStatus in
+                <foreach close=")" collection="taskStatusList" item="listItem" open="(" separator=",">
+                    #{listItem}
+                </foreach>
+            </if>
+            <if test="taskStatus != null">
+                and a.TaskStatus = #{taskStatus}
+            </if>
+        </where>
+        )taskDetailTemp
+    </select>
+
+</mapper>

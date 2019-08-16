@@ -1,0 +1,34 @@
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!--
+        部署新工程的配置文件修改步骤
+        1、修改ContextName
+        2、修改KAFKA_SERVER_LOCATION
+        3、修改INFO_KAFKA_OUT->topic
+     -->
+    <!-- 工程、上下文名字 -->
+    <property name="APPLICATION_NAME" value="task-job"/>
+    <contextName>${APPLICATION_NAME}</contextName>
+    <!-- 日志最大的历史 30天 -->
+    <property name="MAX_HISTORY" value="30"/>
+    <!-- 定义日志文件 输出位置 -->
+    <property name="LOG_DIR" value="${catalina.home}/logs"/>
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <springProfile name="test,onlinetest">
+        <root level="INFO">
+            <!-- 生产环境［不］配置此Appender -->
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+    <springProfile name="prod">
+        <root level="INFO">
+            <!-- 生产环境［不］配置此Appender -->
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+</configuration>
