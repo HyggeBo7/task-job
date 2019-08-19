@@ -6,14 +6,15 @@ import cn.xtits.job.entity.TaskDetail;
 import cn.xtits.job.entity.TaskDetailExample;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Generator 2019-07-04 04:06:57
  */
 public interface TaskDetailService {
 
-    List<TaskDetailDto> listTaskDetailAll(Map<String, Object> map);
+    TaskDetailDto getTaskDetailExt(Integer id);
+
+    List<TaskDetail> listTaskDetailAll(TaskDetailExample example);
 
     int deleteByPrimaryKey(Integer id);
 

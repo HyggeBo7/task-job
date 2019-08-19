@@ -27,4 +27,16 @@
         )taskDetailTemp
     </select>
 
+    <select id="getTaskDetailExt" resultType="cn.xtits.job.dto.TaskDetailDto">
+        SELECT
+        <include refid="Base_Column_List"/>,taskBillCode,taskType
+        FROM (
+        SELECT a.*,b.billCode taskBillCode,b.type taskType
+        FROM `ip_taskdetail` a
+        INNER JOIN `ip_taskmain` b
+        ON a.TaskId = b.Id
+        where a.id = #{id}
+        )taskDetailTemp
+    </select>
+
 </mapper>

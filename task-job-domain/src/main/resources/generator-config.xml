@@ -55,6 +55,12 @@
             <property name="useActualColumnNames" value="true"></property>
             <generatedKey column="Id" sqlStatement="JDBC"/>
         </table>
+        <table tableName="ip_taskexecute" domainObjectName="TaskExecute" delimitIdentifiers="true" enableCountByExample="true"
+               enableDeleteByExample="false" enableSelectByExample="true"
+               enableUpdateByExample="true">
+            <property name="useActualColumnNames" value="true"></property>
+            <generatedKey column="Id" sqlStatement="JDBC"/>
+        </table>
 
     </context>
 </generatorConfiguration>

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Generator on 2019-07-04 04:06:57
@@ -23,8 +22,13 @@ public class TaskDetailServiceImpl implements TaskDetailService {
     private TaskDetailMapper taskDetailMapper;
 
     @Override
-    public List<TaskDetailDto> listTaskDetailAll(Map<String, Object> map) {
-        return taskDetailMapper.listTaskDetailAll(map);
+    public TaskDetailDto getTaskDetailExt(Integer id) {
+        return taskDetailMapper.getTaskDetailExt(id);
+    }
+
+    @Override
+    public List<TaskDetail> listTaskDetailAll(TaskDetailExample example) {
+        return taskDetailMapper.selectByExample(example);
     }
 
     @Override

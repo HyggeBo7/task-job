@@ -965,6 +965,66 @@ public class TaskDetailExample extends BaseQuery {
             return (Criteria) this;
         }
 
+        public Criteria andTaskStatusIsNull() {
+            addCriterion("TaskStatus is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusIsNotNull() {
+            addCriterion("TaskStatus is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusEqualTo(Integer value) {
+            addCriterion("TaskStatus =", value, "taskStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusNotEqualTo(Integer value) {
+            addCriterion("TaskStatus <>", value, "taskStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusGreaterThan(Integer value) {
+            addCriterion("TaskStatus >", value, "taskStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusGreaterThanOrEqualTo(Integer value) {
+            addCriterion("TaskStatus >=", value, "taskStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusLessThan(Integer value) {
+            addCriterion("TaskStatus <", value, "taskStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusLessThanOrEqualTo(Integer value) {
+            addCriterion("TaskStatus <=", value, "taskStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusIn(List<Integer> values) {
+            addCriterion("TaskStatus in", values, "taskStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusNotIn(List<Integer> values) {
+            addCriterion("TaskStatus not in", values, "taskStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusBetween(Integer value1, Integer value2) {
+            addCriterion("TaskStatus between", value1, value2, "taskStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskStatusNotBetween(Integer value1, Integer value2) {
+            addCriterion("TaskStatus not between", value1, value2, "taskStatus");
+            return (Criteria) this;
+        }
+
         public Criteria andAuditFlagIsNull() {
             addCriterion("AuditFlag is null");
             return (Criteria) this;

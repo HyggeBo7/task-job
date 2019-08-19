@@ -11,6 +11,9 @@ import java.util.Map;
 
 public interface TaskDetailExtMapper {
 
+    TaskDetailDto getTaskDetailExt(Integer id);
+
+    @Deprecated
     List<TaskDetailDto> listTaskDetailAll(Map<String, Object> map);
 
 }

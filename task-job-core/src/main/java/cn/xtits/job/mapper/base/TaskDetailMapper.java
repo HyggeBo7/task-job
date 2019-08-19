@@ -2,6 +2,7 @@ package cn.xtits.job.mapper.base;
 
 import cn.xtits.job.entity.TaskDetail;
 import cn.xtits.job.entity.TaskDetailExample;
+
 import java.util.List;
 
 import cn.xtits.job.mapper.TaskDetailExtMapper;

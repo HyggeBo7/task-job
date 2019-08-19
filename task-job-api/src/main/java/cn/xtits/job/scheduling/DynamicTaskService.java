@@ -1,19 +1,17 @@
 package cn.xtits.job.scheduling;
 
-import cn.xtits.job.dto.TaskDetailDto;
-import cn.xtits.job.util.DateUtil;
+import cn.xtits.job.entity.TaskDetail;
+import cn.xtits.job.enums.TaskStatusEnums;
+import cn.xtits.job.service.TaskDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.Trigger;
-import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -29,44 +27,66 @@ public class DynamicTaskService implements DisposableBean {
 
     private static final Logger log = LoggerFactory.getLogger(DynamicTaskService.class);
 
+    /**
+     * 存放任务
+     */
+    private static final ConcurrentHashMap<Integer, ScheduledFuture> TASK_FUTURE_MAP = new ConcurrentHashMap<>();
+
     @Autowired
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
-    private static final ConcurrentHashMap<Integer, ScheduledFuture> TASK_FUTURE_MAP = new ConcurrentHashMap<>();
-
-    public void startTaskCron(List<TaskDetailDto> taskDetailList) {
-        for (TaskDetailDto taskDetailDto : taskDetailList) {
-            startTaskCron(taskDetailDto);
-        }
-    }
+    @Autowired
+    private TaskDetailService taskDetailService;
 
     /**
      * 启动一个任务
      * 在ScheduledFuture中有一个cancel可以停止定时任务。
      */
-    public void startTaskCron(TaskDetailDto taskDetail) {
-        ScheduledFuture scheduledFuture = TASK_FUTURE_MAP.get(taskDetail.getId());
+    public boolean startTaskCron(Integer taskId, String cron) {
+        ScheduledFuture scheduledFuture = TASK_FUTURE_MAP.get(taskId);
+        if (!CronSequenceGenerator.isValidExpression(cron)) {
+            if (scheduledFuture != null) {
+                scheduledFuture.cancel(true);
+                TASK_FUTURE_MAP.remove(taskId);
+            }
+            return false;
+        }
+
         if (scheduledFuture == null) {
-            //scheduledFuture = threadPoolTaskScheduler.schedule(new TaskRunnable(taskDetail), new CronTrigger(taskDetail.getCron()));
-            scheduledFuture = threadPoolTaskScheduler.schedule(new TaskRunnable(taskDetail), new Trigger() {
+            scheduledFuture = threadPoolTaskScheduler.schedule(new TaskDetailRunnable(taskId, cron), new CronTrigger(cron));
+
+            /*scheduledFuture = threadPoolTaskScheduler.schedule(new TaskDetailRunnable(taskId, cron), new Trigger() {
                 @Override
                 public Date nextExecutionTime(TriggerContext triggerContext) {
-                    //log.info("id:【{}】,lastCompletionTime【{}】,lastCompletionTime:【{}】,lastScheduledExecutionTime:【{}】", taskDetail.getId(), DateUtil.parseToString(triggerContext.lastCompletionTime()), DateUtil.parseToString(triggerContext.lastCompletionTime()), DateUtil.parseToString(triggerContext.lastScheduledExecutionTime()));
-                    return DateUtil.getCronSchduleDate(taskDetail.getCron());
+                    return DateUtil.getCronScheduledDate(cron);
                 }
-            });
-            TASK_FUTURE_MAP.put(taskDetail.getId(), scheduledFuture);
-            log.info("新增任务【{}】,cron:【{}】", taskDetail.getId(), taskDetail.getCron());
+           });*/
+
+            TASK_FUTURE_MAP.put(taskId, scheduledFuture);
+            log.info("新增任务【{}】,cron:【{}】", taskId, cron);
         } else {
             scheduledFuture.cancel(true);
-            scheduledFuture = threadPoolTaskScheduler.schedule(new TaskRunnable(taskDetail), new CronTrigger(taskDetail.getCron()));
-            TASK_FUTURE_MAP.put(taskDetail.getId(), scheduledFuture);
-            log.info("更新任务【{}】,cron:【{}】", taskDetail.getId(), taskDetail.getCron());
+            scheduledFuture = threadPoolTaskScheduler.schedule(new TaskDetailRunnable(taskId, cron), new CronTrigger(cron));
+            TASK_FUTURE_MAP.put(taskId, scheduledFuture);
+            log.info("更新任务【{}】,cron:【{}】", taskId, cron);
         }
+        return true;
+    }
+
+    public boolean updateTaskCron(Integer taskId, String cron) {
+        ScheduledFuture scheduledFuture = TASK_FUTURE_MAP.get(taskId);
+        if (scheduledFuture != null && CronSequenceGenerator.isValidExpression(cron)) {
+            scheduledFuture.cancel(true);
+            scheduledFuture = threadPoolTaskScheduler.schedule(new TaskDetailRunnable(taskId, cron), new CronTrigger(cron));
+            TASK_FUTURE_MAP.put(taskId, scheduledFuture);
+            log.info("更新任务【{}】,cron:【{}】", taskId, cron);
+            return true;
+        }
+        return false;
     }
 
     /**
-     * 启此任务
+     * 停止任务
      **/
     public boolean stopTaskCron(Integer taskId) {
         ScheduledFuture future = TASK_FUTURE_MAP.get(taskId);
@@ -75,6 +95,11 @@ public class DynamicTaskService implements DisposableBean {
             if (cancelFlag) {
                 TASK_FUTURE_MAP.remove(taskId);
                 log.info("停止任务【{}】", taskId);
+
+                TaskDetail taskDetail = new TaskDetail();
+                taskDetail.setId(taskId);
+                taskDetail.setTaskStatus(TaskStatusEnums.STOP.value);
+                taskDetailService.updateByPrimaryKeySelective(taskDetail);
             }
             return cancelFlag;
         }
@@ -87,7 +112,7 @@ public class DynamicTaskService implements DisposableBean {
             future.cancel(true);
         }
         TASK_FUTURE_MAP.clear();
-
+        threadPoolTaskScheduler.destroy();
         log.info("销毁任务...");
     }
 }
