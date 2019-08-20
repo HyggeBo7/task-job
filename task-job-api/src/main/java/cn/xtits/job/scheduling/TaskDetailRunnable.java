@@ -22,6 +22,8 @@ public class TaskDetailRunnable implements Runnable {
 
     private TaskExecuteService taskExecuteService;
 
+    private DynamicTaskService dynamicTaskService;
+
     public TaskDetailRunnable(Integer taskDetailId, String cron) {
         this.taskDetailId = taskDetailId;
         this.cron = cron;
@@ -36,7 +38,18 @@ public class TaskDetailRunnable implements Runnable {
             taskExecuteService = ApplicationContextUtils.getBean(TaskExecuteService.class);
         }
         TaskExecute taskExecute = taskExecuteService.insertTaskExecuteSynchronizeGenerate(taskDetailId);
-        logger.info("run()===>date：【{}】,id:{},cron:【{}】,TaskExecuteId:【{}】,code:【{}】", DateTime.now().toString("yyyy-MM-dd HH:mm:ss"), taskDetailId, cron, taskExecute.getId(), taskExecute.getBillNo());
+        Integer taskExecuteId = null;
+        String billNo = null;
+        if (null == taskExecute) {
+            if (dynamicTaskService == null) {
+                dynamicTaskService = ApplicationContextUtils.getBean(DynamicTaskService.class);
+            }
+            dynamicTaskService.stopTaskCron(taskDetailId);
+        } else {
+            taskExecuteId = taskExecute.getId();
+            billNo = taskExecute.getBillNo();
+        }
+        logger.info("run()===>date：【{}】,id:{},cron:【{}】,TaskExecuteId:【{}】,code:【{}】", DateTime.now().toString("yyyy-MM-dd HH:mm:ss"), taskDetailId, cron, taskExecuteId, billNo);
         /*try {
             Thread.sleep(1000 * 3);
         } catch (InterruptedException e) {

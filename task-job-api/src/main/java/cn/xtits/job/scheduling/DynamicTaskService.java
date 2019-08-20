@@ -54,14 +54,6 @@ public class DynamicTaskService implements DisposableBean {
 
         if (scheduledFuture == null) {
             scheduledFuture = threadPoolTaskScheduler.schedule(new TaskDetailRunnable(taskId, cron), new CronTrigger(cron));
-
-            /*scheduledFuture = threadPoolTaskScheduler.schedule(new TaskDetailRunnable(taskId, cron), new Trigger() {
-                @Override
-                public Date nextExecutionTime(TriggerContext triggerContext) {
-                    return DateUtil.getCronScheduledDate(cron);
-                }
-           });*/
-
             TASK_FUTURE_MAP.put(taskId, scheduledFuture);
             log.info("新增任务【{}】,cron:【{}】", taskId, cron);
         } else {

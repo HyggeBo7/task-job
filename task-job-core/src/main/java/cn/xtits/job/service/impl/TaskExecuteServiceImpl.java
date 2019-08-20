@@ -4,6 +4,7 @@ import cn.xtits.job.dto.TaskDetailDto;
 import cn.xtits.job.entity.TaskExecute;
 import cn.xtits.job.entity.TaskExecuteExample;
 import cn.xtits.job.enums.TaskExecuteStatusEnums;
+import cn.xtits.job.enums.TaskStatusEnums;
 import cn.xtits.job.mapper.base.TaskDetailMapper;
 import cn.xtits.job.mapper.base.TaskExecuteMapper;
 import cn.xtits.job.service.TaskExecuteService;
@@ -33,6 +34,9 @@ public class TaskExecuteServiceImpl implements TaskExecuteService {
     @Override
     public TaskExecute insertTaskExecuteSynchronizeGenerate(Integer taskDetailId) {
         TaskDetailDto serverTaskDetail = taskDetailMapper.getTaskDetailExt(taskDetailId);
+        if (!TaskStatusEnums.EXECUTING.value.equals(serverTaskDetail.getTaskStatus())) {
+            return null;
+        }
         TaskExecute taskExecute = new TaskExecute();
         taskExecute.setStatus(TaskExecuteStatusEnums.INIT.value);
         taskExecute.setTaskId(serverTaskDetail.getTaskId());
