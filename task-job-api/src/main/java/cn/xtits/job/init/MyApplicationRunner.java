@@ -5,7 +5,6 @@ import cn.xtits.job.entity.TaskDetailExample;
 import cn.xtits.job.enums.TaskStatusEnums;
 import cn.xtits.job.scheduling.DynamicTaskService;
 import cn.xtits.job.service.TaskDetailService;
-import cn.xtits.job.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +49,11 @@ public class MyApplicationRunner implements ApplicationRunner {
             if (listTaskDetailAll.size() > 0) {
                 List<TaskDetail> collectAll = listTaskDetailAll.stream().filter(d -> CronSequenceGenerator.isValidExpression(d.getCron())).collect(Collectors.toList());
                 logger.info("开始加载定时任务...共:【{}】,执行:【{}】", listTaskDetailAll.size(), collectAll.size());
+                int taskSize = 0;
                 if (collectAll.size() > 0) {
                     TaskDetail taskDetail;
                     for (TaskDetail serverTaskDetail : collectAll) {
-                        boolean flag = dynamicTaskService.startTaskCron(serverTaskDetail.getId(), serverTaskDetail.getCron());
+                        boolean flag = dynamicTaskService.startTaskCron(serverTaskDetail.getId(), serverTaskDetail.getCron(), serverTaskDetail.getStartDate(), serverTaskDetail.getEndDate());
                         //执行成功,并且不是执行状态,修改为执行状态
                         if (flag && !TaskStatusEnums.EXECUTING.value.equals(serverTaskDetail.getTaskStatus())) {
                             taskDetail = new TaskDetail();
@@ -61,9 +61,12 @@ public class MyApplicationRunner implements ApplicationRunner {
                             taskDetail.setTaskStatus(TaskStatusEnums.EXECUTING.value);
                             taskDetailService.updateByPrimaryKeySelective(taskDetail);
                         }
+                        if (flag) {
+                            taskSize++;
+                        }
                     }
                 }
-                logger.info("定时任务已加载完毕...size:{}", collectAll.size());
+                logger.info("定时任务已加载完毕...size:{}", taskSize);
             } else {
                 logger.info("无定时任务加载...");
             }

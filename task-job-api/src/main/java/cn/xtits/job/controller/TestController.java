@@ -48,7 +48,8 @@ public class TestController {
         if (taskDetail == null || taskDetail.getDeleteFlag()) {
             return new AjaxResult(-1, "任务Id【" + id + "】不存在,或者已删除!");
         }
-        boolean taskFlag = dynamicTaskService.startTaskCron(taskDetail.getId(), taskDetail.getCron());
+        Date date = DateUtil.getDate();
+        boolean taskFlag = dynamicTaskService.startTaskCron(taskDetail.getId(), taskDetail.getCron(), date, DateUtil.addDay(date, 1));
         return new AjaxResult(taskFlag);
     }
 

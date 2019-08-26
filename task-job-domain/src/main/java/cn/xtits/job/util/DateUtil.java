@@ -365,6 +365,20 @@ public class DateUtil {
     }
 
     /**
+     * 指定日期加/减N分钟
+     *
+     * @param date   日期
+     * @param minute 分钟
+     * @return Date
+     */
+    public static Date addMinute(Date date, int minute) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.MINUTE, minute);
+        return c.getTime();
+    }
+
+    /**
      * 获取时间差 毫秒  默认格式 yyyy-MM-dd HH:mm:ss
      *
      * @param strStartDate 开始时间

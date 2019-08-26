@@ -5,14 +5,15 @@ package cn.xtits.job.enums;
  * @author: Bo
  * @fileName: TaskStatusEnums
  * @createDate: 2019-08-16 11:13.
- * @description: 任务执行状态[1:正常,2:执行中,-2:执行异常,10:停止]
+ * @description: 任务执行状态[1:正常,2:执行中,-2:执行异常,10:停止,20:完成]
  */
 public enum TaskStatusEnums {
 
     START(1, "正常"),
     EXECUTING(2, "执行中"),
     EXEC_ERROR(-2, "执行异常"),
-    STOP(10, "停止");
+    STOP(10, "停止"),
+    CARRY_OUT(20, "完成");
 
     TaskStatusEnums(Integer value, String msg) {
         this.value = value;

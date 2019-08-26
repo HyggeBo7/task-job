@@ -48,7 +48,7 @@ public class TaskScheduled {
             TaskDetail taskDetail;
             for (TaskDetail serverTaskDetail : listTaskDetailAll) {
                 //开启任务-开启成功返回true,然后更改状态为执行中
-                boolean flag = dynamicTaskService.startTaskCron(serverTaskDetail.getId(), serverTaskDetail.getCron());
+                boolean flag = dynamicTaskService.startTaskCron(serverTaskDetail.getId(), serverTaskDetail.getCron(), serverTaskDetail.getStartDate(), serverTaskDetail.getEndDate());
                 taskDetail = new TaskDetail();
                 taskDetail.setId(serverTaskDetail.getId());
                 if (flag) {
